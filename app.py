@@ -21,7 +21,7 @@ with st.expander("➕ نئی انٹری شامل کریں", expanded=False):
         expenses = st.number_input("اخراجات", min_value=0.0, step=100.0)
         discount = st.number_input("رعایت", min_value=0.0, step=5.0)
         paid = st.number_input("جمع رقم", min_value=0.0, step=1000.0)
-        submit = st.form_submit_with_button("کھاتے میں لکھیں")
+        submit = st.form_submit_button("کھاتے میں لکھیں")
         if submit:
             new_row = {"تاریخ": date, "تفصیل": name, "کیٹیگری": category, "اخراجات": expenses, "ڈسکاؤنٹ": discount, "جمع رقم": paid}
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
