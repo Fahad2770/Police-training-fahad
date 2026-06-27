@@ -5,20 +5,24 @@ import os
 
 # ایپ کی سیٹنگز
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
-
-placeholder = st.empty()
-with placeholder.container():
+if "logged_in" not in st.session_state:
+    st.session_state.logged_ = False
+if not sy.session_state.logged_in:
+    placeholder = st.empty()
+    with placeholder.container():
 # پاس ورڈ لاگ ان سسٹم
-    st.title("🔐 سیکیورٹی لاگ ان")
-    password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
+        st.title("🔐 سیکیورٹی لاگ ان")
+        password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
     if password == "786":
+        st.session_state.logged_in:
         placeholder.empty()
+        st.return()
     elif password!="":
         st.error("درست پاسورڈ لکھیں")
     else:
-        st.stop
+        st.stop()
 # ڈیٹا فائل کا نام
 DB_FILE = "construction_ledger_v3.csv"
 
