@@ -7,14 +7,17 @@ import os
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 
 placeholder = st.empty()
-with placeholder.container()
+with placeholder.container():
 # پاس ورڈ لاگ ان سسٹم
 st.title("🔐 سیکیورٹی لاگ ان")
 password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
-if password != "786":
+if password == "786":
     placeholder.empty()
+    elif:
+        password!="":
+            st.error("صحیح پاسورڈ لکھیں")
     st.stop()
 
 # ڈیٹا فائل کا نام
