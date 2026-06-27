@@ -15,9 +15,8 @@ with placeholder.container():
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
     if password == "786":
         placeholder.empty()
-    elif:
-        password!="":
-            st.error("درست پاسورڈ لکھیں")
+    elif password!="":
+        st.error("درست پاسورڈ لکھیں")
     else:
         st.stop
 # ڈیٹا فائل کا نام
