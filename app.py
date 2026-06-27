@@ -9,17 +9,17 @@ st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layo
 placeholder = st.empty()
 with placeholder.container():
 # پاس ورڈ لاگ ان سسٹم
-st.title("🔐 سیکیورٹی لاگ ان")
-password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
+    st.title("🔐 سیکیورٹی لاگ ان")
+    password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
-if password == "786":
-    placeholder.empty()
-else:
-    password!="":
-        st.error("صحیح پاسورڈ لکھیں")
-    st.stop()
-
+    if password == "786":
+        placeholder.empty()
+    elif:
+        password!="":
+            st.error("درست پاسورڈ لکھیں")
+    else:
+        st.stop
 # ڈیٹا فائل کا نام
 DB_FILE = "construction_ledger_v3.csv"
 
