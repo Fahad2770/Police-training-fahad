@@ -16,7 +16,7 @@ if not sy.session_state.logged_in:
 
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
     if password == "786":
-        st.session_state.logged_in:
+        st.session_state.logged_in = True
         placeholder.empty()
         st.return()
     elif password!="":
