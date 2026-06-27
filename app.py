@@ -18,7 +18,7 @@ if not sy.session_state.logged_in:
     if password == "786":
         st.session_state.logged_in = True
         placeholder.empty()
-        st.return()
+        st.rerun()
     elif password!="":
         st.error("درست پاسورڈ لکھیں")
     else:
