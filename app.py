@@ -6,11 +6,11 @@ import os
 # ایپ کی سیٹنگز
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 
-# Session State check: Agar login pehle se true hai to dobara password na pooche
+# 1. Memory (Session State) check: Agar login pehle se True hai to password na pooche
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# Agar abhi tak login nahi hua, to login screen dikhao
+# 2. Agar user logged in nahi hai, sirf tabhi password screen dikhao
 if not st.session_state.logged_in:
     placeholder = st.empty()
     
@@ -18,11 +18,10 @@ if not st.session_state.logged_in:
         st.title("🔐 سیکیورٹی لاگ ان")
         password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
-        # Galti Ka Hal: Ye poora check ab isi 'if' ke andar spaces ke sath aayega
         if password == "786":
-            st.session_state.logged_in = True
-            placeholder.empty()
-            st.rerun()
+            st.session_state.logged_in = True  # Memory mein hamesha ke liye True kar diya
+            placeholder.empty()               # Password box gayab kar diya
+            st.rerun()                        # App ko dobara chalaya taake data load ho sake
         elif password != "":
             st.error("❌ درست پاسورڈ لکھیں")
             st.stop()
