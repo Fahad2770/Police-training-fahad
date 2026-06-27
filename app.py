@@ -6,13 +6,15 @@ import os
 # ایپ کی سیٹنگز
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 
+placeholder = st.empty()
+with placeholder.container()
 # پاس ورڈ لاگ ان سسٹم
 st.title("🔐 سیکیورٹی لاگ ان")
 password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
 if password != "786":
-    st.warning("براہ کرم ایپ استعمال کرنے کے لیے بائیں طرف (Sidebar) صحیح پاس ورڈ درج کریں۔")
+    placeholder.empty()
     st.stop()
 
 # ڈیٹا فائل کا نام
