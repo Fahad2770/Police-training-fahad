@@ -6,11 +6,14 @@ import os
 # ایپ کی سیٹنگز
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 
-# 1. Memory (Session State) check: Agar login pehle se True hai to password na pooche
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+# 1. URL/Browser check: Dekho kya URL mein pehle se login save hai?
+if "pass" in st.query_params and st.query_params["pass"] == "786":
+    st.session_state.logged_in = True
+else:
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
 
-# 2. Agar user logged in nahi hai, sirf tabhi password screen dikhao
+# 2. Agar user logged in nahi hai, to password screen dikhao
 if not st.session_state.logged_in:
     placeholder = st.empty()
     
@@ -19,9 +22,11 @@ if not st.session_state.logged_in:
         password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
         if password == "786":
-            st.session_state.logged_in = True  # Memory mein hamesha ke liye True kar diya
-            placeholder.empty()               # Password box gayab kar diya
-            st.rerun()                        # App ko dobara chalaya taake data load ho sake
+            st.session_state.logged_in = True
+            # Browser ke URL mein password lock kar diya taake refresh par yaad rahe
+            st.query_params["pass"] = "786"
+            placeholder.empty()
+            st.rerun()
         elif password != "":
             st.error("❌ درست پاسورڈ لکھیں")
             st.stop()
