@@ -7,7 +7,7 @@ import os
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 if "logged_in" not in st.session_state:
     st.session_state.logged_ = False
-if not sy.session_state.logged_in:
+if not st.session_state.logged_in:
     placeholder = st.empty()
     with placeholder.container():
 # پاس ورڈ لاگ ان سسٹم
