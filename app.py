@@ -7,8 +7,8 @@ import os
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 
 # پاس ورڈ لاگ ان سسٹم
-st.sidebar.title("🔐 سیکیورٹی لاگ ان")
-password = st.sidebar.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
+st.title("🔐 سیکیورٹی لاگ ان")
+password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
 
 # اپنا مرضی کا پاس ورڈ یہاں سیٹ کریں (جیسے 1234 یا کچھ بھی)
 if password != "786":
