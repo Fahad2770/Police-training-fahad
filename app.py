@@ -4,7 +4,6 @@ import plotly.express as px
 import os
 
 # ایپ کی سیٹنگز
- یا کچھ بھی)
 st.set_page_config(page_title="🏗️ ہوم کنسٹرکشن کھاتہ", layout="wide")
 
 # Session State check: Agar login pehle se true hai to dobara password na pooche
