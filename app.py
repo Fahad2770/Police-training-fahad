@@ -41,37 +41,35 @@ def load_data():
         try:
             df = pd.read_csv(DB_FILE)
             # کالمز کی اسپیلنگ اور ترتیب پکی کرنا
-            required_cols = ["تاریخ", "تفصیل", "کیٹیگری", "اخراجات", "ڈسکاؤنٹ", "جمع رقم"]
+            required_cols = [","Date","Name","Quantity","Price","Paid Amount","Balance""]
             for col in required_cols:
                 if col not in df.columns:
-                    df[col] = 0 if col in ["اخراجات", "ڈسکاؤنٹ", "جمع رقم"] else ""
+                    df[col] = 0 if col in [","Date","Name","Quantity","Price","Paid Amount","Balance""] else ""
             return df[required_cols]
         except:
-            return pd.DataFrame(columns=["تاریخ", "تفصیل", "کیٹیگری", "اخراجات", "ڈسکاؤنٹ", "جمع رقم"])
+            return pd.DataFrame(columns= [","Date","Name","Quantity","Price","Paid Amount","Balance""]
     else:
-        return pd.DataFrame(columns=["تاریخ", "تفصیل", "کیٹیگری", "اخراجات", "ڈسکاؤنٹ", "جمع رقم"])
-
+        return pd.DataFrame(columns= [","Date","Name","Quantity","Price","Paid Amount","Balance""]
 df = load_data()
 
 # ڈیٹا کو نمبرز میں تبدیل کرنا تاکہ حساب صحیح ہو
-df["اخراجات"] = pd.to_numeric(df["اخراجات"], errors='coerce').fillna(0)
-df["ڈسکاؤنٹ"] = pd.to_numeric(df["ڈسکاؤنٹ"], errors='coerce').fillna(0)
-df["جمع رقم"] = pd.to_numeric(df["جمع رقم"], errors='coerce').fillna(0)
+df["Price"] = pd.to_numeric(df["Price"], errors='coerce').fillna(0)
+df["Paid Amount"] = pd.to_numeric(df["Paid Amount"], errors='coerce').fillna(0)
+df["Balance"] = pd.to_numeric(df["Balance"], errors='coerce').fillna(0)
 
 # مین ٹائٹل
-st.title("🏗️ ہوم کنسٹرکشن کھاتہ دیش بورڈ")
+st.title("🏗️ Home Construction Datail")
 
 # کارڈز (حساب کتاب کے ڈبے)
-total_paid = df["جمع رقم"].sum()
-total_spent = df["اخراجات"].sum()
-total_discount = df["ڈسکاؤنٹ"].sum()
-balance = total_paid - total_spent + total_discount
+total_paid = df["Paid"].sum()
+total_spent = df["Expenses"].sum()
+total_discount = df["Discount"].sum()
+balance_Now = total_paid - total_spent + total_discount
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("💰 کل جمع (Paid)", f"{total_paid:,.1f} Rs")
-col2.metric("📉 کل خرچ (Spent)", f"{total_spent:,.1f} Rs")
-col3.metric("🎁 کل رعایت (Discount)", f"{total_discount:,.1f} Rs")
-col4.metric("⚖️ الباقی رقم (Balance)", f"{balance:,.1f} Rs", delta_color="inverse")
+col2.metric("📉 کل خرچ (Expenses)", f"{total_spent:,.1f} Rs")
+col4.metric("⚖️ الباقی رقم (Balance)", f"{balance_Now:,.1f} Rs", delta_color="inverse")
 
 st.markdown("---")
 
@@ -80,7 +78,7 @@ if not df.empty and total_spent > 0:
     st.subheader("📊 اخراجات کا گراف اور تجزیہ")
     
     # کیٹیگری کے حساب سے خرچہ جمع کرنا
-    chart_data = df[df["اخراجات"] > 0].groupby("کیٹیگری")["اخراجات"].sum().reset_index()
+    chart_data = df[df["Expenses"] > 0].groupby("Typ")["Expenses"].sum().reset_index()
     
     g1, g2 = st.columns(2)
     with g1:
