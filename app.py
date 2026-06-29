@@ -83,6 +83,10 @@ def load_data():
 
 df = load_data()
 
+# ڈیٹا کے نمبرز کو درست کرنا
+for col in ginti_cols:
+    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+
 # 3. سائیڈ بار کنٹرول
 with st.sidebar:
     st.markdown("<h2 style='text-align: center; color: #d97706;'>📥 فائل کنٹرول</h2>", unsafe_allow_html=True)
@@ -108,9 +112,6 @@ with st.sidebar:
     filter_type = st.selectbox("مخصوص کیٹیگری چنیں:", unique_types)
 
 # ڈیٹا فلٹر کرنا
-for col in ginti_cols:
-    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-
 filtered_df = df.copy()
 if search_name:
     filtered_df = filtered_df[filtered_df["Name"].str.contains(search_name, case=False, na=False)]
@@ -125,23 +126,30 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 5. ٹھیکیدار کے فارمولا کا مینو
-st.markdown("### 👷 ٹھیکیدار کھاتہ سمری (Contractor Math)")
+# 5. ٹھیکیدار کا آٹومیٹک ڈیٹا فارمولا (آپ کی CSV فائل کے مطابق)
 total_area_sqft = 1280
 total_contract_value = 345600
-actual_paid_to_thykidar = 317500 
-percent_paid = (actual_paid_to_thykidar / total_contract_value) * 100
+
+# یہاں اب یہ خودکار طریقے سے فائل سے ٹھیکیدار کا خرچہ (Expenses) پلس کرے گا
+actual_paid_to_thykidar = df[df["type"] == "thykidar"]["Expenses"].sum()
+
+if actual_paid_to_thykidar == 0:
+    # اگر کالم میں thykidar نہیں ملا تو متبادل چیک
+    actual_paid_to_thykidar = df[df["type"].str.contains("thykidar|ٹھیکیدار", case=False, na=False)]["Expenses"].sum()
+
+percent_paid = (actual_paid_to_thykidar / total_contract_value) * 100 if total_contract_value > 0 else 0
 budget_75_percent = total_contract_value * 0.75
 savings_at_75 = budget_75_percent - actual_paid_to_thykidar
 thykidar_remaining = total_contract_value - actual_paid_to_thykidar
 
+st.markdown("### 👷 ٹھیکیدار کھاتہ سمری (Contractor Math)")
 t1, t2, t3, t4 = st.columns(4)
 with t1:
     st.metric("📐 کل رقبہ", f"{total_area_sqft:,} مربع فٹ")
 with t2:
     st.metric("📜 کل ٹھیکہ رقم", f"{total_contract_value:,} Rs")
 with t3:
-    st.metric("✅ ادا شدہ (Paid)", f"{actual_paid_to_thykidar:,} Rs", f"{percent_paid:.2f}%")
+    st.metric("✅ ادا شدہ (Expenses Sum)", f"{actual_paid_to_thykidar:,} Rs", f"{percent_paid:.2f}%")
 with t4:
     st.metric("⚖️ 75% بجٹ پوزیشن", f"{savings_at_75:,.0f} Rs", delta_color="inverse")
 
@@ -162,23 +170,31 @@ with c3:
 
 st.markdown("---")
 
-# 7. گراف کا نیا سیکشن (آپ کی فرمائش پر بنائے گئے گراف)
+# 7. گراف کا نیا سیکشن (موبائل اسکرول زوم فکس کے ساتھ)
 st.markdown("### 📊 تعمیری اور مالیاتی گرافکل تجزیہ")
 g1, g2 = st.columns(2)
+
+# فکسڈ گراف ٹول بار اور زوم کنٹرولز کا آپشن
+graph_config = {
+    'scrollZoom': False,        # ماؤس اسکرول یا ٹچ اسکرول سے زوم نہیں ہوگا (موبائل فکس)
+    'displayModeBar': False,    # فالتو ٹول بار چھپا دی گئی ہے تاکہ غلطی سے ٹچ نہ ہو
+    'dragmode': False           # ڈریگ کر کے زوم کرنا بھی بند
+}
 
 with g1:
     # الف: ٹھیکیدار کا گراف
     thykidar_chart_data = pd.DataFrame({
-        "اسٹیٹس": ["ادا شدہ رقم (Paid)", "باقی رقم (Remaining)"],
-        "رقم (Rs)": [actual_paid_to_thykidar, thykidar_remaining]
+        "تفصیل": ["ادا شدہ رقم", "باقی رقم"],
+        "رقم (Rs)": [actual_paid_to_thykidar, max(0, thykidar_remaining)]
     })
     fig_thykidar = px.bar(
-        thykidar_chart_data, x="رقم (Rs)", y="اسٹیٹس", orientation='h',
-        title="👷 ٹھیکیدار بجٹ پروگریس گراف",
-        color="اسٹیٹس", color_discrete_map={"ادا شدہ رقم (Paid)": "#10b981", "باقی رقم (Remaining)": "#f59e0b"}
+        thykidar_chart_data, x="رقم (Rs)", y="تفصیل", orientation='h',
+        title="👷 ٹھیکیدار بجٹ پروگریس گراف (آٹومیٹک ڈیٹا)",
+        color="تفصیل", color_discrete_map={"ادا شدہ رقم": "#10b981", "باقی رقم": "#f59e0b"}
     )
-    fig_thykidar.update_layout(showlegend=False, height=300)
-    st.plotly_chart(fig_thykidar, use_container_width=True)
+    fig_thykidar.update_layout(showlegend=False, height=300, dragmode=False)
+    # یہاں ہم نے config=graph_config لگا دیا ہے تاکہ زوم کا مسئلہ حل ہو جائے
+    st.plotly_chart(fig_thykidar, use_container_width=True, config=graph_config)
 
 with g2:
     # ب: ٹوٹل فنڈ، خرچ اور بیلنس کا گراف
@@ -191,8 +207,9 @@ with g2:
         title="📉 کل فنڈز بمقابلہ اخراجات بمقابلہ بیلنس گراف",
         color="مالیاتی تفصیل", color_discrete_sequence=["#3b82f6", "#ef4444", "#10b981"]
     )
-    fig_finance.update_layout(showlegend=False, height=300)
-    st.plotly_chart(fig_finance, use_container_width=True)
+    fig_finance.update_layout(showlegend=False, height=300, dragmode=False)
+    # یہاں بھی موبائل زوم فکس لگا دیا ہے
+    st.plotly_chart(fig_finance, use_container_width=True, config=graph_config)
 
 # ج: گراف کے نیچے باقی بیلنس کی بڑی ڈسپلے
 st.markdown(f"""
@@ -213,7 +230,8 @@ if not df.empty and total_spent > 0:
         title="کس کیٹیگری پر کتنے فیصد خرچ ہوا؟", hole=0.4,
         color_discrete_sequence=px.colors.qualitative.Safe
     )
-    st.plotly_chart(fig_pie, use_container_width=True)
+    fig_pie.update_layout(dragmode=False)
+    st.plotly_chart(fig_pie, use_container_width=True, config=graph_config)
 
 st.markdown("---")
 
