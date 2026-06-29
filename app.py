@@ -3,33 +3,66 @@ import pandas as pd
 import plotly.express as px
 import os
 
-# 1. ایپ کی بنیادی سیٹنگز اور تھیم ٹچ
+# 1. ایپ کی بنیادی سیٹنگز
 st.set_page_config(
     page_title="🏗️ اسمارٹ ہوم کنسٹرکشن ڈیش بورڈ", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# خوبصورت کسٹم سٹائلنگ (CSS)
+# پکا اور زبردست کسٹم ڈیزائن (CSS) جو ہر تھیم پر کام کرے گا
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .stMetric {
-        background-color: #ffffff;
+    /* مین ہیڈر بینر */
+    .header-box {
+        background: linear-gradient(135deg, #1e5631, #4c9a2a);
+        padding: 30px;
+        border-radius: 15px;
+        color: white;
+        text-align: center;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    /* فائنینشل کارڈز کا کسٹم ڈیزائن */
+    .card-paid {
+        background-color: #ebf7ee;
         padding: 20px;
         border-radius: 12px;
+        border-left: 6px solid #2e7d32;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        border-left: 5px solid #2e7d32;
+        margin-bottom: 10px;
     }
-    div[data-testid="stExpander"] {
-        background-color: #ffffff;
+    .card-spent {
+        background-color: #fdf2f2;
+        padding: 20px;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        border-left: 6px solid #c81e1e;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 10px;
+    }
+    .card-balance {
+        background-color: #f0f7ff;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 6px solid #1a56db;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 10px;
+    }
+    .card-title {
+        font-size: 16px;
+        color: #555555;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .card-value {
+        font-size: 24px;
+        color: #111111;
+        font-weight: bold;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. سیکیورٹی لاگ ان لاک سسٹم
+# 2. سیکیورٹی لاگ ان سسٹم
 if "pass" in st.query_params and st.query_params["pass"] == "786":
     st.session_state.logged_in = True
 else:
@@ -76,17 +109,16 @@ df = load_data()
 for col in ginti_cols:
     df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
 
-# 3. سائیڈ بار مینو اور نیویگیشن (جدید لک کیلئے)
+# 3. سائیڈ بار مینو (سرچ اور فلٹرز)
 with st.sidebar:
-    st.markdown("<h2 style='text-align: center; color: #2e7d32;'>🏗️ مینو کنٹرول</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #2e7d32;'>🏗️ کنٹرول پینل</h2>", unsafe_allow_html=True)
     st.markdown("---")
     
-    # سرچ اور فلٹر کی سہولت
-    st.markdown("### 🔍 ریکارڈ فلٹر کریں")
-    search_name = st.text_input("نام یا تفصیل سے سرچ کریں:")
+    st.markdown("### 🔍 فلٹر اور تلاش")
+    search_name = st.text_input("تفصیل یا نام لکھیں:")
     
     unique_types = ["سب کیٹیگریز"] + sorted(list(df["type"].dropna().unique()))
-    filter_type = st.selectbox("مخصوص کیٹیگری منتخب کریں:", unique_types)
+    filter_type = st.selectbox("مخصوص کیٹیگری چنیں:", unique_types)
 
 # فلٹر لاگو کرنا
 filtered_df = df.copy()
@@ -95,53 +127,69 @@ if search_name:
 if filter_type != "سب کیٹیگریز":
     filtered_df = filtered_df[filtered_df["type"] == filter_type]
 
-# 4. مین ڈیش بورڈ ہیڈر
-st.markdown("<h1 style='text-align: center; color: #1b5e20;'>🏛️ ہوم کنسٹرکشن اسمارٹ کھاتہ</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #666;'>تعمیراتی اخراجات اور حساب کتاب کا جدید نظام</p>", unsafe_allow_html=True)
-st.markdown("---")
+# 4. مین ڈیش بورڈ ہیڈر بینر
+st.markdown("""
+    <div class="header-box">
+        <h1 style="margin:0; padding:0; font-size:32px;">🏛️ ہوم کنسٹرکشن ڈیجیٹل ڈیش بورڈ</h1>
+        <p style="margin:5px 0 0 0; opacity:0.9; font-size:16px;">تعمیراتی بجٹ، اخراجات اور فنڈز کا خوبصورت تجزیہ</p>
+    </div>
+""", unsafe_allow_html=True)
 
-# 5. خوبصورت فائنینشل کارڈز (Metrics)
+# 5. خوبصورت نئے فائنینشل باکسز (Custom HTML Cards)
 total_paid = df["Paid"].sum()
 total_spent = df["Expenses"].sum()
 balance_Now = df["باقی"].iloc[-1] if not df.empty else 0.0
 
 c1, c2, c3 = st.columns(3)
 with c1:
-    st.metric("💰 کل جمع فنڈ (Total Paid)", f"{total_paid:,.0f} Rs")
+    st.markdown(f"""
+        <div class="card-paid">
+            <div class="card-title">💰 کل جمع فنڈ (Total Paid)</div>
+            <div class="card-value">{total_paid:,.1f} Rs</div>
+        </div>
+    """, unsafe_allow_html=True)
 with c2:
-    st.metric("📉 کل تعمیری خرچ (Total Expenses)", f"{total_spent:,.0f} Rs")
+    st.markdown(f"""
+        <div class="card-spent">
+            <div class="card-title">📉 کل تعمیری خرچ (Total Expenses)</div>
+            <div class="card-value">{total_spent:,.1f} Rs</div>
+        </div>
+    """, unsafe_allow_html=True)
 with c3:
-    # اگر باقی رقم منفی میں ہو تو لال رنگ کا الرٹ تاثر دینے کیلئے کسٹمائزڈ بھی کر سکتے ہیں
-    st.metric("⚖️ نیٹ بیلنس پوزیشن (باقی)", f"{balance_Now:,.0f} Rs")
+    st.markdown(f"""
+        <div class="card-balance">
+            <div class="card-title">⚖️ نیٹ بیلنس پوزیشن (باقی رقم)</div>
+            <div class="card-value">{balance_Now:,.1f} Rs</div>
+        </div>
+    """, unsafe_allow_html=True)
 
-st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)
 
-# 6. گراف اور اینالیٹکس (خوبصورت رنگوں کے ساتھ)
+# 6. گراف کا خوبصورت سیکشن
 if not df.empty and total_spent > 0:
-    st.markdown("### 📊 اخراجات کا گراف اور گہرائی سے تجزیہ")
+    st.markdown("### 📊 اخراجات کا گرافکل تجزیہ")
     chart_data = df[df["Expenses"] > 0].groupby("type")["Expenses"].sum().reset_index()
     
     g1, g2 = st.columns(2)
     with g1:
         fig_pie = px.pie(
             chart_data, values="Expenses", names="type", 
-            title="🎯 اخراجات کی فیصد تقسیم", hole=0.4,
-            color_discrete_sequence=px.colors.qualitative.Dark24
+            title="🎯 کس کیٹیگری پر کتنے فیصد خرچ ہوا؟", hole=0.4,
+            color_discrete_sequence=px.colors.sequential.YlGnBu_r
         )
-        fig_pie.update_layout(margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_pie, use_container_width=True)
     with g2:
         fig_bar = px.bar(
             chart_data.sort_values(by="Expenses", ascending=False), 
-            x="type", y="Expenses", title="📊 کس چیز پر کتنا بجٹ لگا؟",
-            color="type", color_discrete_sequence=px.colors.qualitative.Dark24
+            x="type", y="Expenses", title="📊 تعمیری مٹیریل کا کل بجٹ گراف",
+            color="type", color_discrete_sequence=px.colors.sequential.YlGnBu_r
         )
-        fig_bar.update_layout(showlegend=False, margin=dict(t=40, b=20, l=20, r=20))
+        fig_bar.update_layout(showlegend=False)
         st.plotly_chart(fig_bar, use_container_width=True)
 
 st.markdown("---")
 
-# 7. نئی انٹری شامل کرنے کا جدید فارم
+# 7. نئی انٹری کا فارم
 with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کریں", expanded=False):
     with st.form("entry_form", clear_on_submit=True):
         f1, f2, f3 = st.columns(3)
@@ -162,7 +210,7 @@ with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کر
         with f5:
             price_per_unit = st.number_input("فی عدد ریٹ (Price per unit)", min_value=0.0, step=10.0)
         with f6:
-            expenses = st.number_input("کل خرچ (Expenses) - [اگر تعداد 1 ہے تو یہاں لکھیں]", min_value=0.0, step=100.0)
+            expenses = st.number_input("کل خرچ (Expenses) - [تعداد 1 ہو تو یہی لکھیں]", min_value=0.0, step=100.0)
             
         f7, f8 = st.columns(2)
         with f7:
@@ -190,13 +238,11 @@ with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کر
             st.success("✅ انٹری کامیابی سے نئے ڈیزائن کھاتے میں درج ہو گئی!")
             st.rerun()
 
-# 8. موجودہ ریکارڈ اور ڈاؤن لوڈ سسٹم
+# 8. تعمیری ریکارڈ ٹیبل
 st.markdown("### 📋 تعمیری ریکارڈ اور لیجر شیٹ")
 if not filtered_df.empty:
-    # انٹریز کو الٹا کر کے دکھانا تاکہ نئی اوپر آئے
     st.dataframe(filtered_df.iloc[::-1], use_container_width=True) 
 
-    # خوبصورت ڈاؤن لوڈ بٹن سائیڈ پر
     csv_data = df.to_csv(index=False).encode('utf-8')
     st.download_button(
         label="📥 پورا اصل کھاتہ بیک اپ ڈاؤن لوڈ کریں (CSV)",
