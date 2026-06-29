@@ -22,9 +22,12 @@ thykidar_stats = {
 }
 
 # Date-wise construction list ka data
-raw_data = "construction_ledger_v3.csv"
-# DataFrame banana (Taake calculations asan hon)
-df = pd.DataFrame(raw_data)
+# FIXED: Load CSV file properly using pd.read_csv instead of passing string to pd.DataFrame
+try:
+    df = pd.read_csv("construction_ledger_v3.csv")
+except FileNotFoundError:
+    st.error("❌ Error: construction_ledger_v3.csv file not found!")
+    st.stop()
 
 # Automatic Running Balance ('باقی') calculate karna
 running_balance = []
@@ -67,10 +70,8 @@ with tab1:
 
 # ==========================================
 # DASHBOARD 2: Graphs aur Thykidar Detail
+# FIXED: Changed tab1 to tab2 (was using wrong tab)
 # ==========================================
-with tab1: # Python rules ke mutabiq hum tab2 ka content idhar likhein ge
-    pass 
-
 with tab2:
     st.subheader("👷 ٹھیکیدار کی مخصوص تفصیل (Contractor Math)")
     
