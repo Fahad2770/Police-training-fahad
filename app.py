@@ -25,8 +25,8 @@ thykidar_stats = {
 #raw_data =[
 #{"Date": "3-Oct", "Name": "cement coy", "Type": "Bhai Aamir", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
    # {"Date": "2-Oct", "Name": "advance satilement", "Type": "thykidar", "Quantity": 1, "Price": 25000, "Expenses": 25000, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "روڑے ایروں کیلئے", "Type": "ent", "Quantity": 1, "Price": 11000, "Expenses": 11000, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "روڑے کٹائی", "Type": "mazdori", "Quantity": 1, "Price": 1900, "Expenses": 1900, "Discount": 0, "Paid": 0},
+    #{"Date": "", "Name": "روڑے ایروں کیلئے", "Type": "ent", "Quantity": 1, "Price": 11000, "Expenses": 11000, "Discount": 0, "Paid": 0},
+    #{"Date": "", "Name": "روڑے کٹائی", "Type": "mazdori", "Quantity": 1, "Price": 1900, "Expenses": 1900, "Discount": 0, "Paid": 0},
     {"Date": "", "Name": "ریت ٹرالی", "Type": "rait", "Quantity": 1, "Price": 7300, "Expenses": 7300, "Discount": 0, "Paid": 0},
     {"Date": "", "Name": "سیمنٹ 20 عدد", "Type": "cement", "Quantity": 20, "Price": 1380, "Expenses": 27600, "Discount": 0, "Paid": 0},
     {"Date": "", "Name": "پانی کا پائپ", "Type": "helping items", "Quantity": 1, "Price": 1500, "Expenses": 1500, "Discount": 0, "Paid": 0},
