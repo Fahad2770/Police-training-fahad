@@ -70,13 +70,12 @@ with tab1:
 
 # ==========================================
 # DASHBOARD 2: Graphs aur Thykidar Detail
-# FIXED: Changed tab1 to tab2 (was using wrong tab)
 # ==========================================
 with tab2:
     st.subheader("👷 ٹھیکیدار کی مخصوص تفصیل (Contractor Math)")
     
-    # Thykidar ki alag calculations dikhana
-    thykidar_paid = df[df["Type"] == "thykidar"]["Expenses"].sum()
+    # FIXED: Changed "Type" to "type" (lowercase - sahi column name)
+    thykidar_paid = df[df["type"] == "thykidar"]["Expenses"].sum()
     thykidar_remaining = thykidar_stats["total_contract"] - thykidar_paid
     
     t_col1, t_col2, t_col3 = st.columns(3)
@@ -105,7 +104,12 @@ with tab2:
         st.plotly_chart(fig_bar, use_container_width=True)
         
     with g_col2:
-        # 2. Pie Chart: Expenses Breakdown by Type
-        expense_df = df[df["Expenses"] > 0].groupby("Type")["Expenses"].sum().reset_index()
-        fig_pie = px.pie(expense_df, values='Expenses', names='Type', title="اخراجات کہاں کتنے فیصد ہوئے؟", hole=0.3)
-        st.plotly_chart(fig_pie, use_container_width=True)
+        # 2. Pie Chart: Expenses Breakdown by Type (FIXED: Thykidar ko exclude kiya)
+        # FIXED: صرف M.F Rana اور Bhai Aamir کی expenses دکھانا
+        expense_df = df[(df["Expenses"] > 0) & (df["type"] != "thykidar")].groupby("type")["Expenses"].sum().reset_index()
+        
+        if len(expense_df) > 0:
+            fig_pie = px.pie(expense_df, values='Expenses', names='type', title="اخراجات کہاں کتنے فیصد ہوئے؟ (Thykidar شامل نہیں)", hole=0.3)
+            st.plotly_chart(fig_pie, use_container_width=True)
+        else:
+            st.warning("⚠️ اخراجات کی معلومات دستیاب نہیں")
