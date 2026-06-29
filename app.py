@@ -22,47 +22,7 @@ thykidar_stats = {
 }
 
 # Date-wise construction list ka data
-#raw_data =[
-#{"Date": "3-Oct", "Name": "cement coy", "Type": "Bhai Aamir", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
-   # {"Date": "2-Oct", "Name": "advance satilement", "Type": "thykidar", "Quantity": 1, "Price": 25000, "Expenses": 25000, "Discount": 0, "Paid": 0},
-    #{"Date": "", "Name": "روڑے ایروں کیلئے", "Type": "ent", "Quantity": 1, "Price": 11000, "Expenses": 11000, "Discount": 0, "Paid": 0},
-    #{"Date": "", "Name": "روڑے کٹائی", "Type": "mazdori", "Quantity": 1, "Price": 1900, "Expenses": 1900, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "ریت ٹرالی", "Type": "rait", "Quantity": 1, "Price": 7300, "Expenses": 7300, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "سیمنٹ 20 عدد", "Type": "cement", "Quantity": 20, "Price": 1380, "Expenses": 27600, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "پانی کا پائپ", "Type": "helping items", "Quantity": 1, "Price": 1500, "Expenses": 1500, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "اینٹ کی ٹرالی", "Type": "ent", "Quantity": 1, "Price": 44200, "Expenses": 44200, "Discount": 0, "Paid": 0},
-    {"Date": "15-Oct", "Name": "سیمنٹ کمپنی", "Type": "Bhai Aamir", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
-    {"Date": "16-Oct", "Name": "تھکیدر کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 14000, "Expenses": 14000, "Discount": 0, "Paid": 0},
-    {"Date": "20-Oct", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 10000, "Expenses": 10000, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "اینٹ کی ٹرالي", "Type": "ent", "Quantity": 1, "Price": 45000, "Expenses": 45000, "Discount": 0, "Paid": 0},
-    {"Date": "23-Oct", "Name": "سیمنٹ کمپنی", "Type": "Bhai Aamir", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
-    {"Date": "", "Name": "ریت ٹرالی", "Type": "rait", "Quantity": 1, "Price": 7500, "Expenses": 7500, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "اینٹ کی ٹرالی", "Type": "ent", "Quantity": 1, "Price": 44500, "Expenses": 44500, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "موٹر سیکنڈ ہینڈ", "Type": "living items", "Quantity": 1, "Price": 8500, "Expenses": 8500, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "بجری، سریہ، سیمنٹ", "Type": "DPC", "Quantity": 1, "Price": 31300, "Expenses": 31300, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "فوٹو کاپی گیس، بجلی میٹر", "Type": "living items", "Quantity": 1, "Price": 2000, "Expenses": 2000, "Discount": 0, "Paid": 0},
-    {"Date": "23-Oct", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 26000, "Expenses": 26000, "Discount": 0, "Paid": 0},
-    {"Date": "27-Oct", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 15000, "Expenses": 15000, "Discount": 0, "Paid": 0},
-    {"Date": "5-Nov", "Name": "misbah account", "Type": "M.F Rana", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
-    {"Date": "19-Nov", "Name": "misbah account", "Type": "M.F Rana", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
-    {"Date": "29-Nov-26", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 4000, "Expenses": 4000, "Discount": 0, "Paid": 0},
-    {"Date": "10-Dec", "Name": "misbah account", "Type": "M.F Rana", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 193000},
-    {"Date": "", "Name": "bhart waly ko diye", "Type": "bhart", "Quantity": 1, "Price": 70000, "Expenses": 70000, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "ento ki trali", "Type": "ent", "Quantity": 1, "Price": 45000, "Expenses": 45000, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "kam walo ko diye", "Type": "mazdori", "Quantity": 1, "Price": 1000, "Expenses": 1000, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "ryyt trali", "Type": "rait", "Quantity": 1, "Price": 7500, "Expenses": 7500, "Discount": 0, "Paid": 0},
-    {"Date": "10-Dec", "Name": "سیمنٹ میپل لیف", "Type": "cement", "Quantity": 20, "Price": 1450, "Expenses": 29000, "Discount": 0, "Paid": 0},
-    {"Date": "11-Dec", "Name": "x3 اینٹ کی ٹرالی", "Type": "ent", "Quantity": 3, "Price": 45000, "Expenses": 135000, "Discount": 0, "Paid": 0},
-    {"Date": "11-Dec", "Name": "کرایہ 3 ٹرالیوں کا", "Type": "rent", "Quantity": 1, "Price": 600, "Expenses": 600, "Discount": 0, "Paid": 0},
-    {"Date": "", "Name": "ریت چھنوائی", "Type": "mazdori", "Quantity": 1, "Price": 100, "Expenses": 100, "Discount": 0, "Paid": 0},
-    {"Date": "13-Dec", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 12000, "Expenses": 12000, "Discount": 0, "Paid": 0},
-    {"Date": "13-Dec", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 15000, "Expenses": 15000, "Discount": 0, "Paid": 0},
-    {"Date": "13-Dec", "Name": "ٹھیکیدار کو سینٹ کیئے", "Type": "M.F Rana", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 15000},
-    {"Date": "15-Dec", "Name": "ٹھیکیدار کو دیئے", "Type": "thykidar", "Quantity": 1, "Price": 5000, "Expenses": 5000, "Discount": 0, "Paid": 0},
-    {"Date": "16-Dec", "Name": "misbah account", "Type": "M.F Rana", "Quantity": 0, "Price": 0, "Expenses": 0, "Discount": 0, "Paid": 100000},
-    {"Date": "17-Dec", "Name": "چوکھٹ", "Type": "gate doors", "Quantity": 1, "Price": 25000, "Expenses": 25000, "Discount": 0, "Paid": 0}
-]
-raw_data = "construction_ledger_v3.csv
+raw_data = "construction_ledger_v3.csv"
 # DataFrame banana (Taake calculations asan hon)
 df = pd.DataFrame(raw_data)
 
