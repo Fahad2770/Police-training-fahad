@@ -16,7 +16,7 @@ else:
 # 2. Agar user logged in nahi hai, to password screen dikhao
 if not st.session_state.logged_in:
     placeholder = st.empty()
-    
+
     with placeholder.container():
         st.title("🔐 سیکیورٹی لاگ ان")
         password = st.text_input("خفیہ پاس ورڈ لکھیں:", type="password")
@@ -40,16 +40,29 @@ def load_data():
     if os.path.exists(DB_FILE):
         try:
             df = pd.read_csv(DB_FILE)
-            # کالمز کی اسپیلنگ اور ترتیب پکی کرنا
-            required_cols = [","Date","Name","Quantity","Price","Paid Amount","Balance""]
+            # hiding colums k liyy
+            required_cols = ["Date", "Name", "Typs", "Quantity", "Price", "Paid Amount", "Balance"]
+#ginti waly colums ko alag likha tak es ma 0 likhny ka function bna skon
+            ginti_cols = ["Quantity", "Price", "Paid Amount", "Balance"]
+            
             for col in required_cols:
                 if col not in df.columns:
-                    df[col] = 0 if col in [","Date","Name","Quantity","Price","Paid Amount","Balance""] else ""
+                    # Agar aap chahein to iski 4 lines bhi bana sakte hain, dono theek hain:
+                    if col in ginti_cols:
+                        df[col] = 0
+                    else:
+                        df[col] = ""
+            
+            # Yeh bilkul alag line par hai, loop se bahar!
             return df[required_cols]
+            
         except:
-            return pd.DataFrame(columns= [","Date","Name","Quantity","Price","Paid Amount","Balance""]
+            # Baar baar list likhne ki bajaye direct variable use kiya
+            return pd.DataFrame(columns=required_cols)
     else:
-        return pd.DataFrame(columns= [","Date","Name","Quantity","Price","Paid Amount","Balance""]
+        # Yahan bhi direct variable use kiya
+        return pd.DataFrame(columns=required_cols)
+
 df = load_data()
 
 # ڈیٹا کو نمبرز میں تبدیل کرنا تاکہ حساب صحیح ہو
@@ -68,7 +81,7 @@ balance_Now = total_paid - total_spent + total_discount
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("💰 کل جمع (Paid)", f"{total_paid:,.1f} Rs")
-col2.metric("📉 کل خرچ (Expenses)", f"{total_spent:,.1f} Rs")
+col2.metric("📉 کل خچ (Expenses)", f"{total_spent:,.1f} Rs")
 col4.metric("⚖️ الباقی رقم (Balance)", f"{balance_Now:,.1f} Rs", delta_color="inverse")
 
 st.markdown("---")
@@ -76,16 +89,16 @@ st.markdown("---")
 # گراف کا سیکشن
 if not df.empty and total_spent > 0:
     st.subheader("📊 اخراجات کا گراف اور تجزیہ")
-    
+
     # کیٹیگری کے حساب سے خرچہ جمع کرنا
     chart_data = df[df["Expenses"] > 0].groupby("Typ")["Expenses"].sum().reset_index()
-    
+
     g1, g2 = st.columns(2)
     with g1:
-        fig_pie = px.pie(chart_data, values="اخراجات", names="کیٹیگری", title="خرچے کی تقسیم (فیصد میں)", hole=0.3)
+        fig_pie = px.pie(chart_data, values="Expenses" ,names="Typs", title="خرچے کی تقسیم (فیصد میں)", hole=0.3)
         st.plotly_chart(fig_pie, use_container_width=True)
     with g2:
-        fig_bar = px.bar(chart_data, x="کیٹیگری", y="اخراجات", title="کس چیز پر کتنا خرچ ہوا؟", color="کیٹیگری")
+        fig_bar = px.bar(chart_data, x="Typs", y="Expenses", title="کس چیز پر کتنا خرچ ہوا؟", color="Typs")
         st.plotly_chart(fig_bar, use_container_width=True)
 
 st.markdown("---")
@@ -93,18 +106,18 @@ st.markdown("---")
 # نئی انٹری کا فارم
 with st.expander("➕ نئی انٹری شامل کریں", expanded=False):
     with st.form("entry_form", clear_on_submit=True):
-        date = st.text_input("تاریخ (مثال: 25-Dec)")
+        date = st.text_input("Date (مثال: 25-Dec)")
         name = st.text_input("تفصیل / نام")
-        category = st.selectbox("کیٹیگری", [
+        category = st.selectbox("Typs", [
             "thykidar", "cement", "ent", "rait", "linter", "mazdori", 
-            "M.F Rana", "living items", "helping items", "elec", "gate", "water", "rent", "ڈیگر"
+            "M.F Rana", "living items", "helping items", "elec", "gate doors", "water", "rent", "ڈیگر"
         ])
-        expenses = st.number_input("اخراجات", min_value=0.0, step=100.0)
-        discount = st.number_input("رعایت / ڈسکاؤنٹ", min_value=0.0, step=5.0)
-        paid = st.number_input("جمع رقم", min_value=0.0, step=1000.0)
-        
+        expenses = st.number_input("Expenses", min_value=0.0, step=100.0)
+        discount = st.number_input("Discount", min_value=0.0, step=5.0)
+        paid = st.number_input("Paid", min_value=0.0, step=1000.0)
+
         submit = st.form_submit_button("کھاتے میں لکھیں")
-        
+
         if submit:
             new_row = {"تاریخ": date, "تفصیل": name, "کیٹیگری": category, "اخراجات": expenses, "ڈسکاؤنٹ": discount, "جمع رقم": paid}
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
@@ -116,7 +129,7 @@ with st.expander("➕ نئی انٹری شامل کریں", expanded=False):
 st.subheader("📋 موجودہ ریکارڈ")
 if not df.empty:
     st.dataframe(df.iloc[::-1], use_container_width=True) # تازہ ترین انٹری سب سے اوپر دکھانے کے لیے
-    
+
     # ڈیٹا ڈاؤن لوڈ کرنے کا بٹن
     csv_data = df.to_csv(index=False).encode('utf-8')
     st.download_button(
