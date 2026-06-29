@@ -29,6 +29,9 @@ except FileNotFoundError:
     st.error("❌ Error: construction_ledger_v3.csv file not found!")
     st.stop()
 
+# FIXED: Previous balance wali row ko hatana
+df = df[df['Date'].notna()]
+
 # Automatic Running Balance ('باقی') calculate karna
 running_balance = []
 current_bal = 0
@@ -96,20 +99,47 @@ with tab2:
     
     with g_col1:
         # 1. Bar Chart: Expenses vs Paid vs Remaining
+        # FIXED: Remaining balance ko shamil kiya
         chart_data = pd.DataFrame({
-            'Category': ['Total Paid', 'Total Expenses', 'Remaining'],
+            'Category': ['Total Paid', 'Total Expenses', 'Remaining Balance'],
             'Amount (Rs)': [total_paid, total_expenses, remaining_balance]
         })
-        fig_bar = px.bar(chart_data, x='Category', y='Amount (Rs)', title="کل فنڈز بمقابلہ اخراجات", color='Category')
+        fig_bar = px.bar(
+            chart_data, 
+            x='Category', 
+            y='Amount (Rs)', 
+            title="کل فنڈز بمقابلہ اخراجات اور بیلنس",
+            color='Category',
+            text='Amount (Rs)'  # Amount ko bar par likha jayega
+        )
+        # FIXED: Scroll aur zoom ko disable kiya
+        fig_bar.update_layout(
+            dragmode=False,
+            xaxis=dict(fixedrange=True),
+            yaxis=dict(fixedrange=True)
+        )
         st.plotly_chart(fig_bar, use_container_width=True)
         
+        # FIXED: Balance ko graph ke neeche likha
+        st.markdown(f"### 💰 **موجودہ بیلنس:** {remaining_balance:,} Rs")
+        
     with g_col2:
-        # 2. Pie Chart: Expenses Breakdown by Type (FIXED: Thykidar ko exclude kiya)
-        # FIXED: صرف M.F Rana اور Bhai Aamir کی expenses دکھانا
-        expense_df = df[(df["Expenses"] > 0) & (df["type"] != "thykidar")].groupby("type")["Expenses"].sum().reset_index()
+        # 2. Pie Chart: Expenses Breakdown by Type
+        # FIXED: تمام types ko shamil kiya (Thykidar ko hataya nahi)
+        expense_df = df[df["Expenses"] > 0].groupby("type")["Expenses"].sum().reset_index()
         
         if len(expense_df) > 0:
-            fig_pie = px.pie(expense_df, values='Expenses', names='type', title="اخراجات کہاں کتنے فیصد ہوئے؟ (Thykidar شامل نہیں)", hole=0.3)
+            fig_pie = px.pie(
+                expense_df, 
+                values='Expenses', 
+                names='type', 
+                title="اخراجات کہاں کتنے فیصد ہوئے؟ (تمام انقسامات)",
+                hole=0.3
+            )
+            # FIXED: Scroll aur zoom ko disable kiya
+            fig_pie.update_layout(
+                dragmode=False
+            )
             st.plotly_chart(fig_pie, use_container_width=True)
         else:
             st.warning("⚠️ اخراجات کی معلومات دستیاب نہیں")
