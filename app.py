@@ -22,12 +22,13 @@ st.markdown("""
         margin-bottom: 25px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
-    .thykidar-card {
-        background-color: #fffaf0;
+    .balance-footer {
+        background-color: #f0fdf4;
+        border: 2px dashed #16a34a;
         padding: 20px;
         border-radius: 12px;
-        border-top: 5px solid #d97706;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        text-align: center;
+        margin-top: 20px;
         margin-bottom: 20px;
     }
     .stMetric {
@@ -39,7 +40,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 2. سیکیورٹی لاگ ان سسٹم
+# 2. سیکیورٹی لاگ ان سیستم
 if "pass" in st.query_params and st.query_params["pass"] == "786":
     st.session_state.logged_in = True
 else:
@@ -82,16 +83,14 @@ def load_data():
 
 df = load_data()
 
-# 3. سائیڈ بار کنٹرول (سرچ، فلٹر اور فائل اپلوڈ بٹن)
+# 3. سائیڈ بار کنٹرول
 with st.sidebar:
     st.markdown("<h2 style='text-align: center; color: #d97706;'>📥 فائل کنٹرول</h2>", unsafe_allow_html=True)
     
-    # ڈائریکٹ فائل اپلوڈ کرنے کا بٹن (WPS سے تبدیل شدہ فائل کے لیے)
     uploaded_file = st.file_uploader("WPS / Excel سے بدلی ہوئی فائل اپلوڈ کریں:", type=["csv"])
     if uploaded_file is not None:
         try:
             uploaded_df = pd.read_csv(uploaded_file)
-            # کالمز چیک کرنا
             if any(col in uploaded_df.columns for col in ["Name", "Expenses", "Paid"]):
                 uploaded_df.to_csv(DB_FILE, index=False)
                 st.success("✅ فائل کامیابی سے اپلوڈ ہو گئی! کھاتہ اپڈیٹ کر دیا گیا ہے۔")
@@ -126,17 +125,15 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 5. ٹھیکیدار کے فارمولا کا مینو (Contractor Ledger Account)
+# 5. ٹھیکیدار کے فارمولا کا مینو
 st.markdown("### 👷 ٹھیکیدار کھاتہ سمری (Contractor Math)")
-total_to_thykidar = df[df["type"] == "thykidar"]["Expenses"].sum()
-
-# آپ کے دیے گئے فارمولا پیرامیٹرز
 total_area_sqft = 1280
 total_contract_value = 345600
-actual_paid_to_thykidar = 317500 # جو آپ نے شیئر کیا
+actual_paid_to_thykidar = 317500 
 percent_paid = (actual_paid_to_thykidar / total_contract_value) * 100
 budget_75_percent = total_contract_value * 0.75
 savings_at_75 = budget_75_percent - actual_paid_to_thykidar
+thykidar_remaining = total_contract_value - actual_paid_to_thykidar
 
 t1, t2, t3, t4 = st.columns(4)
 with t1:
@@ -148,16 +145,16 @@ with t3:
 with t4:
     st.metric("⚖️ 75% بجٹ پوزیشن", f"{savings_at_75:,.0f} Rs", delta_color="inverse")
 
-st.markdown("---")
-
 # 6. جنرل فائنینشل کارڈز
+st.markdown("---")
+st.markdown("### 💰 کل فنڈز اور اخراجات سمری")
 total_paid = df["Paid"].sum()
 total_spent = df["Expenses"].sum()
 balance_Now = df["باقی"].iloc[-1] if not df.empty else 0.0
 
 c1, c2, c3 = st.columns(3)
 with c1:
-    st.metric("💰 کل جمع فنڈ (Total Paid)", f"{total_paid:,.1f} Rs")
+    st.metric("💰 کل جمع فنڈ (Total Funds)", f"{total_paid:,.1f} Rs")
 with c2:
     st.metric("📉 کل تعمیری خرچ (Total Expenses)", f"{total_spent:,.1f} Rs")
 with c3:
@@ -165,31 +162,62 @@ with c3:
 
 st.markdown("---")
 
-# 7. گراف کا سیکشن
-if not df.empty and total_spent > 0:
-    st.markdown("### 📊 اخراجات کا گرافکل تجزیہ")
-    chart_data = df[df["Expenses"] > 0].groupby("type")["Expenses"].sum().reset_index()
-    
-    g1, g2 = st.columns(2)
-    with g1:
-        fig_pie = px.pie(
-            chart_data, values="Expenses", names="type", 
-            title="🎯 کس کیٹیگری پر کتنے فیصد خرچ ہوا؟", hole=0.4,
-            color_discrete_sequence=px.colors.qualitative.Safe
-        )
-        st.plotly_chart(fig_pie, use_container_width=True)
-    with g2:
-        fig_bar = px.bar(
-            chart_data.sort_values(by="Expenses", ascending=False), 
-            x="type", y="Expenses", title="📊 تعمیری مٹیریل کا کل بجٹ گراف",
-            color="type", color_discrete_sequence=px.colors.qualitative.Safe
-        )
-        fig_bar.update_layout(showlegend=False)
-        st.plotly_chart(fig_bar, use_container_width=True)
+# 7. گراف کا نیا سیکشن (آپ کی فرمائش پر بنائے گئے گراف)
+st.markdown("### 📊 تعمیری اور مالیاتی گرافکل تجزیہ")
+g1, g2 = st.columns(2)
+
+with g1:
+    # الف: ٹھیکیدار کا گراف
+    thykidar_chart_data = pd.DataFrame({
+        "اسٹیٹس": ["ادا شدہ رقم (Paid)", "باقی رقم (Remaining)"],
+        "رقم (Rs)": [actual_paid_to_thykidar, thykidar_remaining]
+    })
+    fig_thykidar = px.bar(
+        thykidar_chart_data, x="رقم (Rs)", y="اسٹیٹس", orientation='h',
+        title="👷 ٹھیکیدار بجٹ پروگریس گراف",
+        color="اسٹیٹس", color_discrete_map={"ادا شدہ رقم (Paid)": "#10b981", "باقی رقم (Remaining)": "#f59e0b"}
+    )
+    fig_thykidar.update_layout(showlegend=False, height=300)
+    st.plotly_chart(fig_thykidar, use_container_width=True)
+
+with g2:
+    # ب: ٹوٹل فنڈ، خرچ اور بیلنس کا گراف
+    finance_chart_data = pd.DataFrame({
+        "مالیاتی تفصیل": ["کل جمع فنڈ", "کل تعمیری خرچ", "باقی نیٹ بیلنس"],
+        "رقم (Rs)": [total_paid, total_spent, balance_Now]
+    })
+    fig_finance = px.bar(
+        finance_chart_data, x="مالیاتی تفصیل", y="رقم (Rs)",
+        title="📉 کل فنڈز بمقابلہ اخراجات بمقابلہ بیلنس گراف",
+        color="مالیاتی تفصیل", color_discrete_sequence=["#3b82f6", "#ef4444", "#10b981"]
+    )
+    fig_finance.update_layout(showlegend=False, height=300)
+    st.plotly_chart(fig_finance, use_container_width=True)
+
+# ج: گراف کے نیچے باقی بیلنس کی بڑی ڈسپلے
+st.markdown(f"""
+    <div class="balance-footer">
+        <span style="font-size: 18px; color: #15803d; font-weight: bold;">📊 کھاتے کا موجودہ باقی بیلنس (Remaining Net Balance):</span>
+        <h2 style="margin: 5px 0 0 0; color: #16a34a; font-size: 36px; font-weight: 900;">{balance_Now:,.1f} Rs</h2>
+    </div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 8. نئی انٹری کا فارم
+# 8. کیٹیگری وائز پائی چارٹ
+if not df.empty and total_spent > 0:
+    st.markdown("### 🎯 مٹیریل اخراجات کا بریک ڈاؤن")
+    chart_data = df[df["Expenses"] > 0].groupby("type")["Expenses"].sum().reset_index()
+    fig_pie = px.pie(
+        chart_data, values="Expenses", names="type", 
+        title="کس کیٹیگری پر کتنے فیصد خرچ ہوا؟", hole=0.4,
+        color_discrete_sequence=px.colors.qualitative.Safe
+    )
+    st.plotly_chart(fig_pie, use_container_width=True)
+
+st.markdown("---")
+
+# 9. نئی انٹری کا فارم
 with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کریں", expanded=False):
     with st.form("entry_form", clear_on_submit=True):
         f1, f2, f3 = st.columns(3)
@@ -238,7 +266,7 @@ with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کر
             st.success("✅ انٹری کامیابی سے محفوظ ہو گئی!")
             st.rerun()
 
-# 9. ریکارڈز کا ڈیٹا ٹیبل
+# 10. ریکارڈز کا ڈیٹا ٹیبل
 st.markdown("### 📋 تعمیری ریکارڈ اور لیجر شیٹ")
 if not filtered_df.empty:
     st.dataframe(filtered_df.iloc[::-1], use_container_width=True) 
