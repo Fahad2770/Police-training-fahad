@@ -29,9 +29,6 @@ except FileNotFoundError:
     st.error("❌ Error: construction_ledger_v3.csv file not found!")
     st.stop()
 
-# FIXED: Previous balance wali row ko hatana
-df = df[df['Date'].notna()]
-
 # Automatic Running Balance ('باقی') calculate karna
 running_balance = []
 current_bal = 0
