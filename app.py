@@ -5,7 +5,7 @@ import os
 
 # 1. ایپ کی بنیادی سیٹنگز
 st.set_page_config(
-    page_title="🏗️ اسمارٹ ہوم کنسٹرکشن ڈیش بورڈ", 
+    page_title="🏗️ اشہد وکیل ہاؤس", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -130,8 +130,8 @@ if filter_type != "سب کیٹیگریز":
 # 4. مین ڈیش بورڈ ہیڈر بینر
 st.markdown("""
     <div class="header-box">
-        <h1 style="margin:0; padding:0; font-size:32px;">🏛️ ہوم کنسٹرکشن ڈیجیٹل ڈیش بورڈ</h1>
-        <p style="margin:5px 0 0 0; opacity:0.9; font-size:16px;">تعمیراتی بجٹ، اخراجات اور فنڈز کا خوبصورت تجزیہ</p>
+        <h1 style="margin:0; padding:0; font-size:32px;">🏛️ اشہد وکیل ہاؤس</h1>
+        <p style="margin:5px 0 0 0; opacity:0.9; font-size:16px;">محمّد فہد وکیل شہر سلطان</p>
     </div>
 """, unsafe_allow_html=True)
 
