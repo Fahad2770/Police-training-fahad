@@ -3,61 +3,38 @@ import pandas as pd
 import plotly.express as px
 import os
 
-# 1. ایپ کی بنیادی سیٹنگز
+# 1. ایپ کی بنیادی ترتیبات
 st.set_page_config(
-    page_title="🏗️ اشہد وکیل ہاؤس", 
+    page_title="🏗️ اسمارٹ ہوم کنسٹرکشن ڈیش بورڈ", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# پکا اور زبردست کسٹم ڈیزائن (CSS) جو ہر تھیم پر کام کرے گا
+# خوبصورت اور پکا ڈیزائن (CSS)
 st.markdown("""
     <style>
-    /* مین ہیڈر بینر */
     .header-box {
-        background: linear-gradient(135deg, #1e5631, #4c9a2a);
+        background: linear-gradient(135deg, #111827, #1f2937);
         padding: 30px;
         border-radius: 15px;
         color: white;
         text-align: center;
         margin-bottom: 25px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
-    /* فائنینشل کارڈز کا کسٹم ڈیزائن */
-    .card-paid {
-        background-color: #ebf7ee;
+    .thykidar-card {
+        background-color: #fffaf0;
         padding: 20px;
         border-radius: 12px;
-        border-left: 6px solid #2e7d32;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        margin-bottom: 10px;
+        border-top: 5px solid #d97706;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        margin-bottom: 20px;
     }
-    .card-spent {
-        background-color: #fdf2f2;
-        padding: 20px;
-        border-radius: 12px;
-        border-left: 6px solid #c81e1e;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        margin-bottom: 10px;
-    }
-    .card-balance {
-        background-color: #f0f7ff;
-        padding: 20px;
-        border-radius: 12px;
-        border-left: 6px solid #1a56db;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        margin-bottom: 10px;
-    }
-    .card-title {
-        font-size: 16px;
-        color: #555555;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    .card-value {
-        font-size: 24px;
-        color: #111111;
-        font-weight: bold;
+    .stMetric {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -105,67 +82,90 @@ def load_data():
 
 df = load_data()
 
-# ڈیٹا کو نمبرز میں درست تبدیل کرنا
-for col in ginti_cols:
-    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-
-# 3. سائیڈ بار مینو (سرچ اور فلٹرز)
+# 3. سائیڈ بار کنٹرول (سرچ، فلٹر اور فائل اپلوڈ بٹن)
 with st.sidebar:
-    st.markdown("<h2 style='text-align: center; color: #2e7d32;'>🏗️ کنٹرول پینل</h2>", unsafe_allow_html=True)
-    st.markdown("---")
+    st.markdown("<h2 style='text-align: center; color: #d97706;'>📥 فائل کنٹرول</h2>", unsafe_allow_html=True)
     
+    # ڈائریکٹ فائل اپلوڈ کرنے کا بٹن (WPS سے تبدیل شدہ فائل کے لیے)
+    uploaded_file = st.file_uploader("WPS / Excel سے بدلی ہوئی فائل اپلوڈ کریں:", type=["csv"])
+    if uploaded_file is not None:
+        try:
+            uploaded_df = pd.read_csv(uploaded_file)
+            # کالمز چیک کرنا
+            if any(col in uploaded_df.columns for col in ["Name", "Expenses", "Paid"]):
+                uploaded_df.to_csv(DB_FILE, index=False)
+                st.success("✅ فائل کامیابی سے اپلوڈ ہو گئی! کھاتہ اپڈیٹ کر دیا گیا ہے۔")
+                st.rerun()
+            else:
+                st.error("فائل کے کالمز میچ نہیں ہو رہے، براہ کرم اصل فارمیٹ والی فائل اپلوڈ کریں۔")
+        except Exception as e:
+            st.error(f"فائل پڑھنے میں مسئلہ ہوا: {e}")
+            
+    st.markdown("---")
     st.markdown("### 🔍 فلٹر اور تلاش")
     search_name = st.text_input("تفصیل یا نام لکھیں:")
     
     unique_types = ["سب کیٹیگریز"] + sorted(list(df["type"].dropna().unique()))
     filter_type = st.selectbox("مخصوص کیٹیگری چنیں:", unique_types)
 
-# فلٹر لاگو کرنا
+# ڈیٹا فلٹر کرنا
+for col in ginti_cols:
+    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+
 filtered_df = df.copy()
 if search_name:
     filtered_df = filtered_df[filtered_df["Name"].str.contains(search_name, case=False, na=False)]
 if filter_type != "سب کیٹیگریز":
     filtered_df = filtered_df[filtered_df["type"] == filter_type]
 
-# 4. مین ڈیش بورڈ ہیڈر بینر
+# 4. مین ڈیش بورڈ ہیڈر
 st.markdown("""
     <div class="header-box">
-        <h1 style="margin:0; padding:0; font-size:32px;">🏛️ اشہد وکیل ہاؤس</h1>
-        <p style="margin:5px 0 0 0; opacity:0.9; font-size:16px;">محمّد فہد وکیل شہر سلطان</p>
+        <h1 style="margin:0; padding:0; font-size:32px;">🏛️ ہوم کنسٹرکشن ماسٹر ڈیش بورڈ</h1>
+        <p style="margin:5px 0 0 0; opacity:0.8; font-size:16px;">آف لائن اور آن لائن سنک (Sync) کے ساتھ خودکار حساب کتاب</p>
     </div>
 """, unsafe_allow_html=True)
 
-# 5. خوبصورت نئے فائنینشل باکسز (Custom HTML Cards)
+# 5. ٹھیکیدار کے فارمولا کا مینو (Contractor Ledger Account)
+st.markdown("### 👷 ٹھیکیدار کھاتہ سمری (Contractor Math)")
+total_to_thykidar = df[df["type"] == "thykidar"]["Expenses"].sum()
+
+# آپ کے دیے گئے فارمولا پیرامیٹرز
+total_area_sqft = 1280
+total_contract_value = 345600
+actual_paid_to_thykidar = 317500 # جو آپ نے شیئر کیا
+percent_paid = (actual_paid_to_thykidar / total_contract_value) * 100
+budget_75_percent = total_contract_value * 0.75
+savings_at_75 = budget_75_percent - actual_paid_to_thykidar
+
+t1, t2, t3, t4 = st.columns(4)
+with t1:
+    st.metric("📐 کل رقبہ", f"{total_area_sqft:,} مربع فٹ")
+with t2:
+    st.metric("📜 کل ٹھیکہ رقم", f"{total_contract_value:,} Rs")
+with t3:
+    st.metric("✅ ادا شدہ (Paid)", f"{actual_paid_to_thykidar:,} Rs", f"{percent_paid:.2f}%")
+with t4:
+    st.metric("⚖️ 75% بجٹ پوزیشن", f"{savings_at_75:,.0f} Rs", delta_color="inverse")
+
+st.markdown("---")
+
+# 6. جنرل فائنینشل کارڈز
 total_paid = df["Paid"].sum()
 total_spent = df["Expenses"].sum()
 balance_Now = df["باقی"].iloc[-1] if not df.empty else 0.0
 
 c1, c2, c3 = st.columns(3)
 with c1:
-    st.markdown(f"""
-        <div class="card-paid">
-            <div class="card-title">💰 کل جمع فنڈ (Total Paid)</div>
-            <div class="card-value">{total_paid:,.1f} Rs</div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.metric("💰 کل جمع فنڈ (Total Paid)", f"{total_paid:,.1f} Rs")
 with c2:
-    st.markdown(f"""
-        <div class="card-spent">
-            <div class="card-title">📉 کل تعمیری خرچ (Total Expenses)</div>
-            <div class="card-value">{total_spent:,.1f} Rs</div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.metric("📉 کل تعمیری خرچ (Total Expenses)", f"{total_spent:,.1f} Rs")
 with c3:
-    st.markdown(f"""
-        <div class="card-balance">
-            <div class="card-title">⚖️ نیٹ بیلنس پوزیشن (باقی رقم)</div>
-            <div class="card-value">{balance_Now:,.1f} Rs</div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.metric("⚖️ نیٹ بیلنس پوزیشن (باقی رقم)", f"{balance_Now:,.1f} Rs")
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("---")
 
-# 6. گراف کا خوبصورت سیکشن
+# 7. گراف کا سیکشن
 if not df.empty and total_spent > 0:
     st.markdown("### 📊 اخراجات کا گرافکل تجزیہ")
     chart_data = df[df["Expenses"] > 0].groupby("type")["Expenses"].sum().reset_index()
@@ -175,28 +175,28 @@ if not df.empty and total_spent > 0:
         fig_pie = px.pie(
             chart_data, values="Expenses", names="type", 
             title="🎯 کس کیٹیگری پر کتنے فیصد خرچ ہوا؟", hole=0.4,
-            color_discrete_sequence=px.colors.sequential.YlGnBu_r
+            color_discrete_sequence=px.colors.qualitative.Safe
         )
         st.plotly_chart(fig_pie, use_container_width=True)
     with g2:
         fig_bar = px.bar(
             chart_data.sort_values(by="Expenses", ascending=False), 
             x="type", y="Expenses", title="📊 تعمیری مٹیریل کا کل بجٹ گراف",
-            color="type", color_discrete_sequence=px.colors.sequential.YlGnBu_r
+            color="type", color_discrete_sequence=px.colors.qualitative.Safe
         )
         fig_bar.update_layout(showlegend=False)
         st.plotly_chart(fig_bar, use_container_width=True)
 
 st.markdown("---")
 
-# 7. نئی انٹری کا فارم
+# 8. نئی انٹری کا فارم
 with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کریں", expanded=False):
     with st.form("entry_form", clear_on_submit=True):
         f1, f2, f3 = st.columns(3)
         with f1:
             date = st.text_input("تاریخ (مثال: 25-Dec)")
         with f2:
-            name = st.text_input("تفصیل / نام / دکان کا نام")
+            name = st.text_input("تفصیل / نام")
         with f3:
             category = st.selectbox("کیٹیگری (type)", [
                 "thykidar", "cement", "ent", "rait", "linter", "mazdori", 
@@ -210,13 +210,13 @@ with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کر
         with f5:
             price_per_unit = st.number_input("فی عدد ریٹ (Price per unit)", min_value=0.0, step=10.0)
         with f6:
-            expenses = st.number_input("کل خرچ (Expenses) - [تعداد 1 ہو تو یہی لکھیں]", min_value=0.0, step=100.0)
+            expenses = st.number_input("کل خرچ (Expenses)", min_value=0.0, step=100.0)
             
         f7, f8 = st.columns(2)
         with f7:
             discount = st.number_input("ڈسکاؤنٹ (Discount)", min_value=0.0, step=5.0)
         with f8:
-            paid = st.number_input("جمع کروائی گئی رقم (Paid) - [اگر فنڈ آیا ہے]", min_value=0.0, step=1000.0)
+            paid = st.number_input("جمع کروائی گئی رقم (Paid)", min_value=0.0, step=1000.0)
 
         submit = st.form_submit_button("⚡ کھاتے میں محفوظ کریں")
 
@@ -235,10 +235,10 @@ with st.expander("➕ نئی تعمیری انٹری یا فنڈز شامل کر
             df_new = pd.DataFrame([new_row])
             df = pd.concat([df, df_new], ignore_index=True)[required_cols]
             df.to_csv(DB_FILE, index=False)
-            st.success("✅ انٹری کامیابی سے نئے ڈیزائن کھاتے میں درج ہو گئی!")
+            st.success("✅ انٹری کامیابی سے محفوظ ہو گئی!")
             st.rerun()
 
-# 8. تعمیری ریکارڈ ٹیبل
+# 9. ریکارڈز کا ڈیٹا ٹیبل
 st.markdown("### 📋 تعمیری ریکارڈ اور لیجر شیٹ")
 if not filtered_df.empty:
     st.dataframe(filtered_df.iloc[::-1], use_container_width=True) 
@@ -251,4 +251,4 @@ if not filtered_df.empty:
         mime="text/csv"
     )
 else:
-    st.info("آپ کے فلٹر کے مطابق کوئی ریکارڈ نہیں ملا یا کھاتہ خالی ہے۔")
+    st.info("کوئی ریکارڈ نہیں ملا۔")
