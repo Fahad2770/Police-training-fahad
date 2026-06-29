@@ -97,7 +97,7 @@ Date,Name,type,Quantity,Price per unit,Expenses,Discount,Paid,باقی
 4-Mar,الیکٹریشن,elec,1,2000,2000,0,0,14538
 4-Mar,سریہ واپسی,M.F Rana,,,,0,38000,52538
 5-Mar,ریت کی ٹرالی,linter,1,7500,7500,0,0,45038
-5-Mar,پھٹے کیلئے کرایہ,thakidar,1,200,200,0,0,44838
+5-Mar,پھٹے کیلئے کرایہ,thykidar,1,200,200,0,0,44838
 5-Mar,دیگ خیرات ,khirat,1,9300,9300,0,0,35538
 5-Mar,ریت کی ٹرالی ,linter,1,7500,7500,0,0,28038
 5-Mar,300x اینٹ کی ٹرالی,linter,3000,14.06666667,42200,0,0,-14162
@@ -148,6 +148,6 @@ Date,Name,type,Quantity,Price per unit,Expenses,Discount,Paid,باقی
 14-Jun,مین گیٹ,gate doors,1,25000,25000,0,0,49038
 16june,water bore,water,1,33000,33000,0,0,16038
 17june, Roda trali,ent,1,11200,11200,0,0,4838
-18june, Roda ktai ,thakidar,1,2500,2500,0,0,2338
+18june, Roda ktai ,thykidar,1,2500,2500,0,0,2338
 17jun, phatta gum hony pr jurmana ,personal,1,500,500,0,0,1838
 23-Jun,Misbah account ,M.F Rana,0,0,0,0,50000,51838
